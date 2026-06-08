@@ -73,7 +73,7 @@ function syncSendMode() {
   topicInput.disabled = !useCloud;
 
   if (!localApiAvailable) {
-    sendHint.textContent = "GitHub Pages 页面不能直接使用局域网上传；如需局域网，请打开电脑端显示的备用局域网地址。";
+    sendHint.textContent = "如需局域网，请打开电脑端显示的备用局域网地址。";
   } else {
     sendHint.textContent = useCloud
       ? "云上传模式：手机和电脑不需要同一 Wi-Fi。"
