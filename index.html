@@ -19,11 +19,18 @@
         <span id="serverState" class="state">待拍照</span>
       </div>
 
-      <label class="cameraBox" for="photoInput">
-        <input id="photoInput" type="file" accept="image/*" capture="environment">
-        <span class="cameraIcon">+</span>
-        <span class="cameraText">拍照或选择图片</span>
-      </label>
+      <div class="sourcePicker">
+        <input id="cameraInput" type="file" accept="image/*" capture="environment">
+        <input id="galleryInput" type="file" accept="image/*">
+        <button id="cameraBtn" class="sourceButton" type="button">
+          <span class="sourceIcon">+</span>
+          <span>拍照</span>
+        </button>
+        <button id="galleryBtn" class="sourceButton" type="button">
+          <span class="sourceIcon">□</span>
+          <span>从相册/文件选择</span>
+        </button>
+      </div>
 
       <div id="previewWrap" class="previewWrap" hidden>
         <img id="preview" alt="拍摄预览">
@@ -39,7 +46,7 @@
 
       <div class="progress" aria-live="polite">
         <div id="progressBar" class="progressBar"></div>
-        <span id="progressText">请先拍照</span>
+        <span id="progressText">请先选择图片</span>
       </div>
 
       <div class="confirmArea">
