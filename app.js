@@ -27,6 +27,7 @@ let cropMode = "crop";
 let isBusy = false;
 let cropDrag = null;
 let ntfyBaseUrl = "https://ntfy.sh";
+let localApiAvailable = false;
 
 function setStatus(text, progress = 0) {
   progressText.textContent = text;
@@ -63,11 +64,22 @@ function setBusy(nextBusy) {
 }
 
 function syncSendMode() {
+  if (!localApiAvailable && !cloudMode.checked) {
+    cloudMode.checked = true;
+  }
+
   const useCloud = cloudMode.checked;
+  cloudMode.disabled = !localApiAvailable;
   topicInput.disabled = !useCloud;
-  sendHint.textContent = useCloud
-    ? "云上传模式：手机和电脑不需要同一 Wi-Fi。"
-    : "备用局域网模式：手机必须能访问电脑本地服务。";
+
+  if (!localApiAvailable) {
+    sendHint.textContent = "GitHub Pages 页面不能直接使用局域网上传；如需局域网，请打开电脑端显示的备用局域网地址。";
+  } else {
+    sendHint.textContent = useCloud
+      ? "云上传模式：手机和电脑不需要同一 Wi-Fi。"
+      : "备用局域网模式：手机必须打开电脑端备用局域网地址。";
+  }
+
   localStorage.setItem("ocrUseCloud", useCloud ? "1" : "0");
   localStorage.setItem("ocrNtfyTopic", normalizeTopic(topicInput.value));
 }
@@ -313,6 +325,10 @@ async function submitCode() {
         count: "云端"
       };
     } else {
+      if (!localApiAvailable) {
+        throw new Error("当前页面不能使用局域网上传。请打开电脑端备用局域网地址，或勾选不使用局域网上传。");
+      }
+
       const response = await fetch("/api/records", {
         method: "POST",
         headers: {
@@ -419,15 +435,25 @@ cloudMode.checked = savedUseCloud === null ? true : savedUseCloud === "1";
 syncSendMode();
 
 fetch("/api/status")
-  .then((response) => response.json())
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return response.json();
+  })
   .then((payload) => {
+    localApiAvailable = true;
+    cloudMode.disabled = false;
     if (payload.ntfyTopic && !topicInput.value) {
       topicInput.value = payload.ntfyTopic;
-      syncSendMode();
     }
+    syncSendMode();
     serverState.textContent = "已连接";
   })
   .catch(() => {
+    localApiAvailable = false;
+    cloudMode.checked = true;
+    syncSendMode();
     serverState.textContent = cloudMode.checked ? "云上传" : "离线";
   });
 

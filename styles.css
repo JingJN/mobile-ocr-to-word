@@ -314,6 +314,10 @@ h2 {
   accent-color: var(--accent);
 }
 
+.sendHead input:disabled {
+  opacity: 0.45;
+}
+
 button {
   min-height: 46px;
   border: 1px solid var(--line);
