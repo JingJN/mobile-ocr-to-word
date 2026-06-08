@@ -1,4 +1,7 @@
-const photoInput = document.querySelector("#photoInput");
+const cameraInput = document.querySelector("#cameraInput");
+const galleryInput = document.querySelector("#galleryInput");
+const cameraBtn = document.querySelector("#cameraBtn");
+const galleryBtn = document.querySelector("#galleryBtn");
 const previewWrap = document.querySelector("#previewWrap");
 const preview = document.querySelector("#preview");
 const cropBox = document.querySelector("#cropBox");
@@ -51,7 +54,10 @@ function normalizeTopic(value) {
 
 function setBusy(nextBusy) {
   isBusy = nextBusy;
-  photoInput.disabled = nextBusy;
+  cameraInput.disabled = nextBusy;
+  galleryInput.disabled = nextBusy;
+  cameraBtn.disabled = nextBusy;
+  galleryBtn.disabled = nextBusy;
   recognizeBtn.disabled = nextBusy || !currentImage;
   submitBtn.disabled = nextBusy || !normalizeCode(codeInput.value);
 }
@@ -330,16 +336,14 @@ async function submitCode() {
   } catch (error) {
     console.error(error);
     setStatus("上传失败", 100);
-    setHint(`上传失败：请确认手机和电脑在同一 Wi-Fi，电脑服务仍在运行。${error.message}`, true);
+    setHint(`上传失败：请确认 topic 正确、手机能上网、电脑端服务仍在运行。${error.message}`, true);
     serverState.textContent = "失败";
   } finally {
     setBusy(false);
   }
 }
 
-photoInput.addEventListener("change", () => {
-  const file = photoInput.files?.[0];
-
+function handleSelectedFile(file) {
   if (!file) {
     return;
   }
@@ -366,6 +370,24 @@ photoInput.addEventListener("change", () => {
       setHint(`照片加载失败：${error.message}`, true);
       serverState.textContent = "失败";
     });
+}
+
+cameraBtn.addEventListener("click", () => {
+  cameraInput.value = "";
+  cameraInput.click();
+});
+
+galleryBtn.addEventListener("click", () => {
+  galleryInput.value = "";
+  galleryInput.click();
+});
+
+cameraInput.addEventListener("change", () => {
+  handleSelectedFile(cameraInput.files?.[0]);
+});
+
+galleryInput.addEventListener("change", () => {
+  handleSelectedFile(galleryInput.files?.[0]);
 });
 
 recognizeBtn.addEventListener("click", recognizeImage);
