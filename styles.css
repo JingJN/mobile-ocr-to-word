@@ -89,18 +89,15 @@ h2 {
   white-space: nowrap;
 }
 
-.cameraBox {
+.sourcePicker {
+  position: relative;
   display: grid;
-  place-items: center;
-  min-height: 190px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
   margin: 18px 0 14px;
-  border: 2px dashed #9db3ac;
-  border-radius: 8px;
-  background: #fbfcf9;
-  cursor: pointer;
 }
 
-.cameraBox input {
+.sourcePicker input {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -108,7 +105,17 @@ h2 {
   pointer-events: none;
 }
 
-.cameraIcon {
+.sourceButton {
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  min-height: 168px;
+  border: 2px dashed #9db3ac;
+  background: #fbfcf9;
+  color: var(--text);
+}
+
+.sourceIcon {
   display: grid;
   place-items: center;
   width: 56px;
@@ -120,8 +127,7 @@ h2 {
   line-height: 1;
 }
 
-.cameraText {
-  margin-top: 10px;
+.sourceButton span:last-child {
   color: var(--muted);
   font-size: 15px;
 }
@@ -386,6 +392,14 @@ button.primary:not(:disabled):active {
 
   .actions {
     align-items: stretch;
+  }
+
+  .sourcePicker {
+    grid-template-columns: 1fr;
+  }
+
+  .sourceButton {
+    min-height: 118px;
   }
 
   button {
