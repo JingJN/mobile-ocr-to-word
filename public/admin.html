@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>编号记录管理</title>
+  <link rel="stylesheet" href="admin.css">
+  <script defer src="admin.js"></script>
+</head>
+<body>
+  <main class="shell">
+    <section class="top">
+      <div>
+        <p class="eyebrow">电脑端管理</p>
+        <h1>编号记录</h1>
+      </div>
+      <button id="refreshBtn" type="button">刷新</button>
+    </section>
+
+    <section class="summary">
+      <span id="countText">共 0 条</span>
+      <button id="clearBtn" class="danger" type="button">清空全部记录</button>
+    </section>
+
+    <p id="message" class="message">正在读取记录...</p>
+
+    <section class="tableWrap">
+      <table>
+        <thead>
+          <tr>
+            <th>序号</th>
+            <th>编号</th>
+            <th>来源</th>
+            <th>时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="recordBody"></tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

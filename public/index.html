@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>拍照识别编号</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <main class="shell">
+    <section class="panel">
+      <div class="topbar">
+        <div>
+          <p class="eyebrow">手机拍照上传</p>
+          <h1>识别编号并写入电脑 Word</h1>
+        </div>
+        <span id="serverState" class="state">待拍照</span>
+      </div>
+
+      <div class="sourcePicker">
+        <input id="cameraInput" type="file" accept="image/*" capture="environment">
+        <input id="galleryInput" type="file" accept="image/*">
+        <button id="cameraBtn" class="sourceButton" type="button">
+          <span class="sourceIcon">+</span>
+          <span>拍照</span>
+        </button>
+        <button id="galleryBtn" class="sourceButton" type="button">
+          <span class="sourceIcon">□</span>
+          <span>从相册/文件选择</span>
+        </button>
+      </div>
+
+      <div id="previewWrap" class="previewWrap" hidden>
+        <img id="preview" alt="拍摄预览">
+        <div id="cropBox" class="cropBox" hidden>
+          <span class="cropHandle"></span>
+        </div>
+      </div>
+
+      <div id="cropTools" class="cropTools" hidden>
+        <button id="resetCropBtn" type="button">重置裁剪</button>
+        <button id="fullImageBtn" type="button">使用整张</button>
+      </div>
+
+      <div class="progress" aria-live="polite">
+        <div id="progressBar" class="progressBar"></div>
+        <span id="progressText">请先选择图片</span>
+      </div>
+
+      <div class="confirmArea">
+        <label for="codeInput">确认编号</label>
+        <input id="codeInput" type="text" inputmode="latin" autocomplete="off" placeholder="识别后会显示在这里">
+        <p id="hint" class="hint">只保留数字和英文字母，提交前可以手动修改。</p>
+      </div>
+
+      <div class="sendPanel">
+        <div class="sendHead">
+          <label for="cloudMode">不使用局域网上传</label>
+          <input id="cloudMode" type="checkbox" checked>
+        </div>
+        <input id="topicInput" type="text" autocomplete="off" placeholder="输入电脑端显示的 ntfy topic">
+        <p id="sendHint" class="hint">手机和电脑不需要同一 Wi-Fi；只要都能上网即可。</p>
+      </div>
+
+      <div class="actions">
+        <button id="recognizeBtn" type="button" disabled>识别裁剪区域</button>
+        <button id="submitBtn" class="primary" type="button" disabled>确认并上传</button>
+      </div>
+    </section>
+
+    <section class="historyPanel">
+      <div class="historyHead">
+        <h2>本机提交记录</h2>
+        <button id="clearLocalBtn" type="button">清空</button>
+      </div>
+      <ol id="historyList" class="historyList"></ol>
+    </section>
+  </main>
+</body>
+</html>
