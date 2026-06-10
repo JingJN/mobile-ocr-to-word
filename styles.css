@@ -158,6 +158,7 @@ h2 {
     0 0 0 1px rgba(22, 107, 92, 0.75);
   cursor: move;
   touch-action: none;
+  transform-origin: center;
 }
 
 .cropBox[hidden],
@@ -202,13 +203,28 @@ h2 {
 }
 
 .cropTools {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) 1.4fr auto;
+  align-items: center;
   gap: 10px;
   margin: 10px 0 0;
 }
 
 .cropTools button {
-  flex: 1;
+  min-width: 0;
+}
+
+.rotationText {
+  min-width: 44px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.rotationSlider {
+  width: 100%;
+  accent-color: var(--accent);
 }
 
 .progress {
@@ -404,6 +420,19 @@ button.primary:not(:disabled):active {
 
   .sourceButton {
     min-height: 118px;
+  }
+
+  .cropTools {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rotationSlider {
+    grid-column: 1 / -1;
+  }
+
+  .rotationText {
+    grid-column: 1 / -1;
+    min-height: 28px;
   }
 
   button {

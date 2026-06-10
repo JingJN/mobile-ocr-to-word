@@ -8,6 +8,10 @@ const cropBox = document.querySelector("#cropBox");
 const cropTools = document.querySelector("#cropTools");
 const resetCropBtn = document.querySelector("#resetCropBtn");
 const fullImageBtn = document.querySelector("#fullImageBtn");
+const rotateLeftBtn = document.querySelector("#rotateLeftBtn");
+const rotateRightBtn = document.querySelector("#rotateRightBtn");
+const rotationSlider = document.querySelector("#rotationSlider");
+const rotationText = document.querySelector("#rotationText");
 const recognizeBtn = document.querySelector("#recognizeBtn");
 const submitBtn = document.querySelector("#submitBtn");
 const codeInput = document.querySelector("#codeInput");
@@ -23,6 +27,7 @@ const clearLocalBtn = document.querySelector("#clearLocalBtn");
 
 let currentImage = null;
 let crop = { x: 0.08, y: 0.32, width: 0.84, height: 0.28 };
+let cropRotation = 0;
 let cropMode = "crop";
 let isBusy = false;
 let cropDrag = null;
@@ -103,6 +108,8 @@ function getPreviewRect() {
 function applyCropBox() {
   if (!currentImage || cropMode === "full") {
     cropBox.hidden = true;
+    rotationText.textContent = `${cropRotation}°`;
+    rotationSlider.value = cropRotation;
     return;
   }
 
@@ -112,23 +119,45 @@ function applyCropBox() {
   cropBox.style.top = `${rect.top + rect.height * crop.y}px`;
   cropBox.style.width = `${rect.width * crop.width}px`;
   cropBox.style.height = `${rect.height * crop.height}px`;
+  cropBox.style.transform = `rotate(${cropRotation}deg)`;
+  rotationText.textContent = `${cropRotation}°`;
+  rotationSlider.value = cropRotation;
+}
+
+function normalizeAngle(angle) {
+  const normalized = ((((Number(angle) || 0) + 180) % 360) + 360) % 360 - 180;
+  return normalized === -180 ? 180 : Math.round(normalized);
 }
 
 function resetCrop() {
   cropMode = "crop";
+  cropRotation = 0;
   crop = { x: 0.08, y: 0.32, width: 0.84, height: 0.28 };
   applyCropBox();
   recognizeBtn.textContent = "识别裁剪区域";
   setStatus("请裁剪编号区域后识别", 0);
-  setHint("拖动裁剪框，右下角圆点可缩放。");
+  setHint("拖动裁剪框，右下角圆点可缩放；用滑杆或左转/右转调整方向。");
 }
 
 function useFullImage() {
   cropMode = "full";
   cropBox.hidden = true;
+  rotationText.textContent = `${cropRotation}°`;
   recognizeBtn.textContent = "识别整张照片";
   setStatus("将识别整张照片", 0);
-  setHint("如果编号占画面较小，建议使用裁剪区域识别。");
+  setHint("如果编号占画面较小，建议使用裁剪区域识别；旋转滑杆仍会影响识别方向。");
+}
+
+function rotateCrop(delta) {
+  cropRotation = normalizeAngle(cropRotation + delta);
+  applyCropBox();
+  setHint(`当前识别方向：${cropRotation}°。`);
+}
+
+function setCropRotation(angle) {
+  cropRotation = normalizeAngle(angle);
+  applyCropBox();
+  setHint(`当前识别方向：${cropRotation}°。`);
 }
 
 function loadHistory() {
@@ -193,12 +222,20 @@ async function makeOcrCanvas(imageUrl) {
   const scale = Math.min(1, maxSide / Math.max(source.width, source.height));
   const width = Math.max(1, Math.round(source.width * scale));
   const height = Math.max(1, Math.round(source.height * scale));
+  const rotationRadians = (cropRotation * Math.PI) / 180;
+  const rotatedWidth = Math.ceil(Math.abs(width * Math.cos(rotationRadians)) + Math.abs(height * Math.sin(rotationRadians)));
+  const rotatedHeight = Math.ceil(Math.abs(width * Math.sin(rotationRadians)) + Math.abs(height * Math.cos(rotationRadians)));
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
-  canvas.width = width;
-  canvas.height = height;
-  ctx.drawImage(img, source.x, source.y, source.width, source.height, 0, 0, width, height);
+  canvas.width = Math.max(1, rotatedWidth);
+  canvas.height = Math.max(1, rotatedHeight);
+
+  ctx.save();
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  ctx.rotate(rotationRadians);
+  ctx.drawImage(img, source.x, source.y, source.width, source.height, -width / 2, -height / 2, width, height);
+  ctx.restore();
 
   const imageData = ctx.getImageData(0, 0, width, height);
   const data = imageData.data;
@@ -410,6 +447,9 @@ recognizeBtn.addEventListener("click", recognizeImage);
 submitBtn.addEventListener("click", submitCode);
 resetCropBtn.addEventListener("click", resetCrop);
 fullImageBtn.addEventListener("click", useFullImage);
+rotateLeftBtn.addEventListener("click", () => rotateCrop(270));
+rotateRightBtn.addEventListener("click", () => rotateCrop(90));
+rotationSlider.addEventListener("input", () => setCropRotation(rotationSlider.value));
 cloudMode.addEventListener("change", syncSendMode);
 topicInput.addEventListener("input", syncSendMode);
 codeInput.addEventListener("input", () => {
